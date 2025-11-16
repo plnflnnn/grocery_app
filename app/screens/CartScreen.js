@@ -18,6 +18,7 @@ import { apiUrl } from "../settings/index";
 
 function CartScreen({ navigation }) {
   const { getCart, cart = [], error, clearCart } = useCart();
+  const [cartItems, setCartItems] = useState(cart);
   const [total, setTotal] = useState(0);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
   const [loading, setLoading] = useState(false);
@@ -26,8 +27,9 @@ function CartScreen({ navigation }) {
   const amountInCents = Math.round(total * 100);
 
   const calcTotal = (cart) => {
-    const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2);
-    return total;
+    if(!cart || cart.length === 0) return 0
+    const calc = cart.reduce((sum, i) => sum + i.price * i.quantity, 0).toFixed(2);
+    setTotal(calc);
   }
 
   const fetchPaymentSheetParams = async () => {
@@ -87,7 +89,13 @@ function CartScreen({ navigation }) {
 
   useEffect(() => {
     getCart();
+    calcTotal(cart);
   }, []);
+
+  useEffect(() => {
+    setCartItems(cart);
+    calcTotal(cart);
+  }, [cart]);
 
   useEffect(() => {
     if (cart.length > 0 && total >= 0.5) {
@@ -97,10 +105,6 @@ function CartScreen({ navigation }) {
     }
   }, [cart, total]);
 
-  useEffect(() => {
-    const calc = calcTotal(cart)
-    setTotal(calc);
-  }, [cart]);
 
   return (
     <>
@@ -113,12 +117,12 @@ function CartScreen({ navigation }) {
           </>
         )}
 
-      {Array.isArray(cart) && cart.length === 0 ? (
+      {Array.isArray(cartItems) && cartItems.length === 0 ? (
         <Text style={styles.cartText}>Your cart is empty</Text>
       ) : (
         <>
           <FlatList
-            data={cart}
+            data={cartItems}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <CartItem

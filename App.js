@@ -23,18 +23,19 @@ export default function App() {
   const restoreUser = async () => {
     try {
       const storedUser = await getUser();
-      if (storedUser) setUser(storedUser);
+      setUser(storedUser);
+      if(storedUser && storedUser !== null) {
+        setIsReady(true)
+      } else {
+        setIsReady(false);
+      }
     } catch (error) {
       console.error("Failed to restore user:", error);
     }
   };
 
   useEffect(() => {
-    const init = async () => {
-      await restoreUser();
-      setIsReady(true);
-    };
-    init();
+    restoreUser();
   }, []);
 
 

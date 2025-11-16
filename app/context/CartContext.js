@@ -57,28 +57,35 @@ export const CartProvider = ({ children }) => {
       try {
         await createCart();
 
-        const existing = await db.getAllAsync(
+        const existing = await db.getFirstAsync(
           `SELECT * FROM cartitems WHERE id = "${newCartItem.id}"`
         );
 
-        if (existing.length > 0) {
+        if (existing) {
+
+
+          let newQuantity = newCartItem.quantity + existing.quantity;
+          if(newQuantity > 10) newQuantity = 10;
+
           await db.execAsync(
-            `UPDATE cartitems SET quantity = "${newCartItem.quantity}" WHERE id = "${newCartItem.id}"`
+            `UPDATE cartitems SET quantity = "${newQuantity}" WHERE id = "${newCartItem.id}"`
           );
           await notify(newCartItem.name);
           setCart((prevCart) =>
             prevCart.map((item) =>
               item.id === newCartItem.id
-                ? { ...item, quantity: newCartItem.quantity }
+                ? { ...item, quantity: newQuantity }
                 : item
             )
           );
+          console.log('UPDATED NEW ITEM')
         } else {
           await db.execAsync(
             `INSERT INTO cartitems (id, quantity, name, src, category, price)
              VALUES ("${newCartItem.id}", "${newCartItem.quantity}", "${newCartItem.name}", "${newCartItem.src}", "${newCartItem.category}", "${newCartItem.price}")`
           );
           await notify(newCartItem.name);
+          console.log('ADDED NEW ITEM')
           setCart((prevCart) => [...prevCart, newCartItem]);
         }
 
@@ -95,7 +102,6 @@ export const CartProvider = ({ children }) => {
   const changeCartItemQuantity = async ({ id, quantity }) => {
     await handleAsync(async () => {
       try {
-        await createCart();
         const item = await db.getFirstAsync(`SELECT * FROM cartitems WHERE id = "${id}"`);
         if (!item) {
           console.log(`changeCartItemQuantity: Item with id ${id} not found`);
@@ -120,7 +126,6 @@ export const CartProvider = ({ children }) => {
   const deleteItemFromCart = async (id) => {
     await handleAsync(async () => {
       try {
-        await createCart();
         await db.execAsync(`DELETE FROM cartitems WHERE id = ${id}`);
         setCart((prevCart) => prevCart.filter((item) => item.id !== id));
         console.log(`deleteItem: Removed item with id ${id}`);
@@ -152,7 +157,6 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = async () => {
     try {
-      await createCart();
       await db.execAsync('DELETE FROM cartitems');
       console.log('All cart items deleted from database');
       setCart([]);

@@ -1,78 +1,104 @@
-import React from "react";
-import { StyleSheet } from "react-native";
 import * as Yup from "yup";
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { View, TextInput, Text } from "react-native";
+import { Formik } from "formik";
+import ErrorMessage from "../components/ErrorMessage";
+import defaultStyles from "../config/styles";
 import Screen from "../components/Screen";
-import {
-  ErrorMessage,
-  Form,
-  FormField,
-  SubmitButton,
-} from "../components/forms";
-import Text from "../components/Text";
 import LoadingOverlay from "../components/LoadingOverlay";
 import useUser from "../hooks/useUser";
+import AppButton from "../components/Button";
 
 const validationSchema = Yup.object().shape({
-  oldPassword: Yup.string().required().min(4).label("Password"),
-  newPassword: Yup.string().required().min(4).label("Password"),
+  oldPassword: Yup.string().required().min(4).label("Old Password"),
+  newPassword: Yup.string().required().min(4).label("New Password"),
 });
 
 function ChangePasswordScreen(props) {
   const { changePassword, error, response, loading } = useUser();
 
-  const handleSubmit = async (values, { resetForm }) => {
+  const handleFormSubmit = async (values, { resetForm }) => {
     await changePassword(values, resetForm);
   };
 
   return (
     <>
       <LoadingOverlay visible={loading} />
-      <Screen style={styles.container}>
-        {!error && response && <Text>{response}</Text>}
-
-        <Form
-          initialValues={{ password: "" }}
-          onSubmit={handleSubmit}
+      <Screen style={defaultStyles.container}>
+        <Formik
+          initialValues={{ oldPassword: "", newPassword: "" }}
+          onSubmit={handleFormSubmit}
           validationSchema={validationSchema}
         >
-          <ErrorMessage error={response} visible={error} />
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <>
+              {!error && response && <Text>{response}</Text>}
+              {error && <ErrorMessage error={response} visible={error} />}
 
-          <FormField
-            autoCapitalize="none"
-            autoCorrect={false}
-            icon="lock"
-            name="oldPassword"
-            placeholder="Old Password"
-            secureTextEntry
-            textContentType="password"
-            style={styles.input}
-          />
-          <FormField
-            autoCapitalize="none"
-            autoCorrect={false}
-            icon="lock"
-            name="newPassword"
-            placeholder="New Password"
-            secureTextEntry
-            textContentType="password"
-            style={styles.input}
-          />
+              <View style={defaultStyles.fieldContainer}>
+                <MaterialCommunityIcons
+                  name="lock"
+                  size={20}
+                  color={defaultStyles.colors.medium}
+                  style={defaultStyles.icon}
+                />
+                <TextInput
+                  placeholder="Old Password"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  secureTextEntry
+                  textContentType="password"
+                  style={[defaultStyles.input, defaultStyles.text]}
+                  onChangeText={handleChange("oldPassword")}
+                  onBlur={handleBlur("oldPassword")}
+                  value={values.oldPassword}
+                />
+              </View>
+              {touched.oldPassword && errors.oldPassword && (
+                <Text style={[defaultStyles.text, defaultStyles.errorText]}>
+                  {errors.oldPassword}
+                </Text>
+              )}
 
-          <SubmitButton title="Change Password" />
-        </Form>
+              <View style={defaultStyles.fieldContainer}>
+                <MaterialCommunityIcons
+                  name="lock"
+                  size={20}
+                  color={defaultStyles.colors.medium}
+                  style={defaultStyles.icon}
+                />
+                <TextInput
+                  placeholder="New Password"
+                  autoCapitalize="none"
+                  secureTextEntry
+                  autoCorrect={false}
+                  textContentType="newPassword"
+                  style={[defaultStyles.input, defaultStyles.text]}
+                  onChangeText={handleChange("newPassword")}
+                  onBlur={handleBlur("newPassword")}
+                  value={values.newPassword}
+                />
+              </View>
+              {touched.newPassword && errors.newPassword && (
+                <Text style={[defaultStyles.text, defaultStyles.errorText]}>
+                  {errors.newPassword}
+                </Text>
+              )}
+
+              <AppButton title="Change Password" onPress={handleSubmit} />
+            </>
+          )}
+        </Formik>
       </Screen>
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-  },
-  input: {
-    width: "100%",
-  },
-});
 
 export default ChangePasswordScreen;

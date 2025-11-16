@@ -60,7 +60,7 @@ function ListingsScreen({ navigation }) {
       return result;
     } catch (error) {
       setError(true);
-      console.error("❌ fetchData error:", error);
+      console.error("listings fetchData error:", error);
     }
   };
 
@@ -68,7 +68,7 @@ function ListingsScreen({ navigation }) {
     try {
       return await db.getAllAsync("SELECT * FROM groceryitems");
     } catch (e) {
-      console.log(`❌ getGroceryItems: An error occurred ${e}`);
+      console.log(`getGroceryItems: An error occurred ${e}`);
       return [];
     }
   }
@@ -81,12 +81,13 @@ function ListingsScreen({ navigation }) {
             `(${item.id}, "${item.item_name}", "${item.item_src}", "${item.item_category}", "${item.item_price}")`
         )
         .join(", ");
+        console.log('values ' + values);
       await db.execAsync(
         `INSERT INTO groceryitems (id, name, src, category, price) VALUES ${values}`
       );
-      console.log("✅ Items inserted into groceryitems");
+      console.log("Items inserted into groceryitems");
     } catch (e) {
-      console.log(`❌ saveGroceryItems: An error occurred ${e}`);
+      console.log(`saveGroceryItems: An error occurred ${e}`);
     }
   }
 
@@ -102,13 +103,13 @@ function ListingsScreen({ navigation }) {
           price DECIMAL(10, 2)
         );
       `);
-      console.log("✅ Table 'groceryitems' created or already exists");
+      console.log("Table 'groceryitems' created or already exists");
 
       if (items && items.length > 0) {
         await saveGroceryItems(items);
       }
     } catch (e) {
-      console.log(`❌ createDb: An error occurred ${e}`);
+      console.log(`createDb: An error occurred ${e}`);
     }
   }
 
@@ -136,7 +137,7 @@ function ListingsScreen({ navigation }) {
 
       return await db.getAllAsync(sql);
     } catch (e) {
-      console.log(`❌ filter: An error occurred ${e}`);
+      console.log(`filter: An error occurred ${e}`);
     }
   }
 
@@ -169,8 +170,8 @@ function ListingsScreen({ navigation }) {
   };
 
   useEffect(() => {
-    console.log("🏁 ListingsScreen mounted");
     getListings();
+    console.log("ListingsScreen mounted");
   }, []);
 
   useEffect(() => {

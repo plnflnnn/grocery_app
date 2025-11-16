@@ -3,7 +3,7 @@ import AuthContext from "../auth/context";
 import storage from "../auth/storage";
 import { apiUrl } from "../settings/index";
 
-export default useUser = () => {
+function useUser() {
   const { user, setUser } = useContext(AuthContext);
   const [state, setState] = useState({
     error: false,
@@ -47,12 +47,10 @@ export default useUser = () => {
         throw new Error(`Signup failed: ${res.status}`);
       }
       const { user, token } = result;
-      const { userName, id} = user;
-      const userObj = { id, email: userData.email, userName };
       setTimeout(async () => {
-        setUser(userObj);
-        await saveUser(userObj, token);
-      }, 100); 
+        setUser(user);
+        await saveUser(user, token);
+      }, 100);
     });
   };
 
@@ -64,32 +62,33 @@ export default useUser = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-  
-      const text = await res.text(); 
-  
+
+      const text = await res.text();
+
       let result;
       try {
-        result = JSON.parse(text); 
+        result = JSON.parse(text);
       } catch (err) {
         throw new Error(`Failed to parse JSON. Response: ${text}`);
       }
-  
+
+      //if (!res.ok) throw new Error(result.error || 'Login failed');
       if (!res.ok) throw new Error(result.error || 'Login failed');
-  
+
       const { token, user } = result;
       if (!user) throw new Error("No user returned from server");
-  
+
       const userObj = {
         id: user.id,
         email: user.email,
         userName: user.userName,
       };
-  
+
       setUser(userObj);
       await saveUser(userObj, token);
     });
   };
-  
+
 
   const logOut = () => {
     setUser(null);
@@ -103,7 +102,7 @@ export default useUser = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, oldPassword, newPassword }),
       });
-  
+
       let result;
       try {
         result = await res.json();
@@ -111,28 +110,27 @@ export default useUser = () => {
         const text = await res.text();
         throw new Error(`Failed to parse JSON. Response: ${text}`);
       }
-  
+
       if (!res.ok) {
         setState(prev => ({ ...prev, error: true, response: 'Incorrect old password' }));
         throw new Error(result.error);
       }
-  
+
       const { token, message } = result;
       if (!token) {
         setState(prev => ({ ...prev, error: true, response: 'Something went wrong' }));
         throw new Error("No token returned from server");
       }
-  
-      // ✅ Save the token and user again to ensure they stay logged in
+
       await saveUser(user, token);
       setUser(user);
-  
+
       setState(prev => ({ ...prev, response: message || 'Password updated successfully!' }));
       resetForm();
       setTimeout(() => setState(prev => ({ ...prev, response: '' })), 1000);
     });
   };
-  
+
 
   return {
     logIn,
@@ -142,3 +140,5 @@ export default useUser = () => {
     ...state
   };
 };
+
+export default useUser;

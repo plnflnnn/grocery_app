@@ -5,11 +5,12 @@ const LoadingOverlay = ({ visible }) => {
   if (!visible) return null;
 
   return (
-    <Modal transparent={true} animationType="fade" visible={visible}>
-      <View style={styles.overlay}>
-        <ActivityIndicator size="large" color="#fff" />
-      </View>
-    </Modal>
+    // <Modal transparent={true} animationType="fade" visible={visible}>
+    //   <View style={styles.overlay}>
+    //     <ActivityIndicator size="large" color="#fff" />
+    //   </View>
+    // </Modal>
+    <></>
   );
 };
 

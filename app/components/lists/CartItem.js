@@ -8,7 +8,6 @@ import { useCart } from "../../context/CartContext";
 
 function CartItem({ title, subTitle, imageUrl, onPress, thumbnailUrl, data }) {
     const [quantity, setQuantity] = useState(data.quantity);
-    //const [item, setItem] = useState(data);
     const { deleteItemFromCart, changeCartItemQuantity} = useCart();
 
     let minNum = 1;
@@ -17,6 +16,10 @@ function CartItem({ title, subTitle, imageUrl, onPress, thumbnailUrl, data }) {
     useEffect(() => {
         changeCartItemQuantity({ id: data.id, quantity });
     }, [quantity]);
+
+    useEffect(() => {
+        setQuantity(data.quantity);
+    }, [data]);
 
     function decreaseQuantity() {
         let quantityNum = quantity;
