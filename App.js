@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { SQLiteProvider } from 'expo-sqlite';
