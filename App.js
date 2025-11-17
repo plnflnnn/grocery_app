@@ -1,7 +1,6 @@
-import 'react-native-gesture-handler';
+import "react-native-gesture-handler";
 import { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { SQLiteProvider } from 'expo-sqlite';
 import { StripeProvider } from "@stripe/stripe-react-native";
 
 import navigationTheme from "./app/navigation/navigationTheme";
@@ -17,21 +16,19 @@ import { stripeKey } from "./app/settings/index";
 
 export default function App() {
   const [user, setUser] = useState(null);
+  const [publishableKey] = useState(stripeKey);
   const [isReady, setIsReady] = useState(false);
-  const [publishableKey, setPublishableKey] = useState(stripeKey);
   const { getUser } = storage;
 
   const restoreUser = async () => {
     try {
       const storedUser = await getUser();
-      setUser(storedUser);
-      if(storedUser && storedUser !== null) {
-        setIsReady(true)
-      } else {
-        setIsReady(false);
-      }
+      setUser(storedUser || null);
     } catch (error) {
       console.error("Failed to restore user:", error);
+      setUser(null);
+    } finally {
+      setIsReady(true);
     }
   };
 
@@ -39,30 +36,28 @@ export default function App() {
     restoreUser();
   }, []);
 
-
   useEffect(() => {
-   console.log(user);
+    console.log("USER in App:", user);
   }, [user]);
 
+  if (!isReady) {
+    return <LoadingOverlay visible />;
+  }
+
   return (
-    <SQLiteProvider databaseName="grocery_store.db">
-      <StripeProvider
-        publishableKey={publishableKey}
-        merchantIdentifier="merchant.identifier"
-        urlScheme="myapp"
-      >
+      <StripeProvider publishableKey={publishableKey} merchantIdentifier="merchant.identifier" urlScheme="myapp">
         <UserContext.Provider value={{ user, setUser }}>
           <CartProvider>
             <OfflineNotice />
-            <LoadingOverlay visible={!isReady} />
-            {isReady && (
-              <NavigationContainer ref={navigationRef} theme={navigationTheme}>
-                {user ? <AppNavigator /> : <AuthNavigator />}
-              </NavigationContainer>
-            )}
-          </CartProvider>
+            <NavigationContainer
+              ref={navigationRef}
+              theme={navigationTheme}
+              key={user ? "app" : "auth"}
+            >
+              {user ? <AppNavigator /> : <AuthNavigator />}
+            </NavigationContainer>
+         </CartProvider>
         </UserContext.Provider>
       </StripeProvider>
-    </SQLiteProvider>
   );
 }

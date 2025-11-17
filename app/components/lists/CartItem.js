@@ -42,7 +42,7 @@ function CartItem({ title, subTitle, imageUrl, onPress, thumbnailUrl, data }) {
       <View style={styles.cartItem}>
         <Image
           style={styles.image}
-          tint="light"
+          tint="dark"
           preview={{ uri: thumbnailUrl }}
           uri={imageUrl}
         />

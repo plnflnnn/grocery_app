@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
-import AuthContext from "../auth/context";
+import UserContext from "../auth/context";
 import storage from "../auth/storage";
 import { apiUrl } from "../settings/index";
 
 function useUser() {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(UserContext);
   const [state, setState] = useState({
     error: false,
     loading: false,
@@ -47,10 +47,10 @@ function useUser() {
         throw new Error(`Signup failed: ${res.status}`);
       }
       const { user, token } = result;
-      setTimeout(async () => {
-        setUser(user);
+      //setTimeout(async () => {
         await saveUser(user, token);
-      }, 100);
+        setUser(user);
+      //}, 100);
     });
   };
 
@@ -84,8 +84,8 @@ function useUser() {
         userName: user.userName,
       };
 
-      setUser(userObj);
       await saveUser(userObj, token);
+      setUser(userObj);
     });
   };
 

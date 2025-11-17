@@ -79,7 +79,7 @@ function ListingDetailsScreen({ route }) {
       <Image
         style={styles.image}
         preview={{ uri: item.src }}
-        tint="light"
+        tint="dark"
         uri={item.src}
       />
       <View style={styles.detailsContainer}>

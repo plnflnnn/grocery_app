@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import ListItem from "../components/lists/ListItem";
 import colors from "../config/colors";
 import Icon from "../components/Icon";

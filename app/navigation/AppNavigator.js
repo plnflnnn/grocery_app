@@ -1,39 +1,20 @@
+// app/navigation/AppNavigator.js
+import React, { useContext, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import AccountNavigator from "./AccountNavigator";
 import FeedNavigator from "./FeedNavigator";
 import CartNavigator from "./CartNavigator";
-import * as Notifications from 'expo-notifications';
-import { useEffect } from "react";
-import { Alert } from "react-native";
+import UserContext from "../auth/context";
 
 const Tab = createBottomTabNavigator();
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
 const AppNavigator = () => {
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert("Notifications are disabled", "Please enable them in your device settings.");
-        return false;
-      }
-
-      Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-      });
-
-    })();
-  }, []);
+    console.log("🟩 AppNavigator render, user =", user);
+  }, [user]);
 
   return (
     <Tab.Navigator>
@@ -44,7 +25,7 @@ const AppNavigator = () => {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="home" color={color} size={size} />
           ),
-          headerShown: false
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -54,7 +35,7 @@ const AppNavigator = () => {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="cart" color={color} size={size} />
           ),
-          headerShown: false
+          headerShown: false,
         }}
       />
       <Tab.Screen
@@ -64,7 +45,7 @@ const AppNavigator = () => {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account" color={color} size={size} />
           ),
-          headerShown: false
+          headerShown: false,
         }}
       />
     </Tab.Navigator>

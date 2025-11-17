@@ -1,52 +1,78 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { useSQLiteContext } from "expo-sqlite";
-import * as Notifications from 'expo-notifications';
+import { createContext, useContext, useState, useEffect } from "react";
+import useDB from "../hooks/useDB";
+// import * as Notifications from 'expo-notifications';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const db = useSQLiteContext();
   const [cart, setCart] = useState([]);
   const [state, setState] = useState({
     error: false,
     loading: false,
-    response: ''
+    response: "",
   });
 
+  const { db, loading: dbLoading, withDB } = useDB();
+
+  useEffect(() => {
+    if (db) {
+      createCart();
+      console.log("Cart created (CartContext)");
+    }
+  }, [db]);
+
   const handleAsync = async (fn) => {
-    setState(prev => ({ ...prev, loading: true, error: false, response: 'Loading...' }));
+    setState((prev) => ({
+      ...prev,
+      loading: true,
+      error: false,
+      response: "Loading...",
+    }));
     try {
       await fn();
     } catch (err) {
-      setState(prev => ({ ...prev, loading: false, error: true, response: 'Something went wrong..' }));
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: true,
+        response: "Something went wrong..",
+      }));
       console.error(err);
     } finally {
-      setState(prev => ({ ...prev, loading: false, response: '' }));
+      setState((prev) => ({ ...prev, loading: false, response: "" }));
     }
   };
 
- const createCart = async () => {
+  const createCart = async () => {
     await handleAsync(async () => {
-        try {
-            await db.execAsync(`
-                create table if not exists cartitems (id integer primary key not null, quantity integer, name text, src text, category text, price decimal(10,2) );`);
-            } catch(e){
-              console.log(`createCartDb: An error occured ${e}`)
-        }
+      try {
+        await withDB(async (db) => {
+          await db.execAsync(`
+            CREATE TABLE IF NOT EXISTS cartitems (
+              id integer primary key not null,
+              quantity integer,
+              name text,
+              src text,
+              category text,
+              price decimal(10,2)
+            );
+          `);
+        });
+      } catch (e) {
+        console.log(`createCartDb: An error occured ${e}`);
+      }
     });
   };
-
-  useEffect(() => {
-    createCart();
-  }, []);
 
   const getCartItems = async () => {
     await handleAsync(async () => {
       try {
-        const result = await db.getAllAsync('SELECT * FROM cartitems');
+        const result = await withDB(async (db) => {
+          return await db.getAllAsync("SELECT * FROM cartitems");
+        });
         setCart(result || []);
       } catch (e) {
-        console.log('getCartItems error', e);
+        console.log("getCartItems error", e);
         setCart([]);
       }
     });
@@ -57,20 +83,23 @@ export const CartProvider = ({ children }) => {
       try {
         await createCart();
 
-        const existing = await db.getFirstAsync(
-          `SELECT * FROM cartitems WHERE id = "${newCartItem.id}"`
-        );
+        const existing = await withDB(async (db) => {
+          return await db.getFirstAsync(
+            `SELECT * FROM cartitems WHERE id = "${newCartItem.id}"`
+          );
+        });
 
         if (existing) {
-
-
           let newQuantity = newCartItem.quantity + existing.quantity;
-          if(newQuantity > 10) newQuantity = 10;
+          if (newQuantity > 10) newQuantity = 10;
 
-          await db.execAsync(
-            `UPDATE cartitems SET quantity = "${newQuantity}" WHERE id = "${newCartItem.id}"`
-          );
-          await notify(newCartItem.name);
+          await withDB(async (db) => {
+            await db.execAsync(
+              `UPDATE cartitems SET quantity = "${newQuantity}" WHERE id = "${newCartItem.id}"`
+            );
+          });
+
+          // await notify(newCartItem.name);
           setCart((prevCart) =>
             prevCart.map((item) =>
               item.id === newCartItem.id
@@ -78,14 +107,16 @@ export const CartProvider = ({ children }) => {
                 : item
             )
           );
-          console.log('UPDATED NEW ITEM')
+          console.log("UPDATED NEW ITEM");
         } else {
-          await db.execAsync(
-            `INSERT INTO cartitems (id, quantity, name, src, category, price)
-             VALUES ("${newCartItem.id}", "${newCartItem.quantity}", "${newCartItem.name}", "${newCartItem.src}", "${newCartItem.category}", "${newCartItem.price}")`
-          );
-          await notify(newCartItem.name);
-          console.log('ADDED NEW ITEM')
+          await withDB(async (db) => {
+            await db.execAsync(
+              `INSERT INTO cartitems (id, quantity, name, src, category, price)
+               VALUES ("${newCartItem.id}", "${newCartItem.quantity}", "${newCartItem.name}", "${newCartItem.src}", "${newCartItem.category}", "${newCartItem.price}")`
+            );
+          });
+          // await notify(newCartItem.name);
+          console.log("ADDED NEW ITEM");
           setCart((prevCart) => [...prevCart, newCartItem]);
         }
 
@@ -102,15 +133,22 @@ export const CartProvider = ({ children }) => {
   const changeCartItemQuantity = async ({ id, quantity }) => {
     await handleAsync(async () => {
       try {
-        const item = await db.getFirstAsync(`SELECT * FROM cartitems WHERE id = "${id}"`);
+        const item = await withDB(async (db) => {
+          return await db.getFirstAsync(
+            `SELECT * FROM cartitems WHERE id = "${id}"`
+          );
+        });
+
         if (!item) {
           console.log(`changeCartItemQuantity: Item with id ${id} not found`);
           return;
         }
 
-        await db.execAsync(
-          `UPDATE cartitems SET quantity = "${quantity}" WHERE id = "${id}"`
-        );
+        await withDB(async (db) => {
+          await db.execAsync(
+            `UPDATE cartitems SET quantity = "${quantity}" WHERE id = "${id}"`
+          );
+        });
 
         setCart((prevCart) =>
           prevCart.map((item) =>
@@ -126,7 +164,9 @@ export const CartProvider = ({ children }) => {
   const deleteItemFromCart = async (id) => {
     await handleAsync(async () => {
       try {
-        await db.execAsync(`DELETE FROM cartitems WHERE id = ${id}`);
+        await withDB(async (db) => {
+          await db.execAsync(`DELETE FROM cartitems WHERE id = ${id}`);
+        });
         setCart((prevCart) => prevCart.filter((item) => item.id !== id));
         console.log(`deleteItem: Removed item with id ${id}`);
       } catch (e) {
@@ -144,38 +184,43 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const notify = async (itemName = 'Item') => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: '🛒 Item Added',
-        body: `${itemName} added to your cart!`,
-        data: { screen: 'Cart' },
-      },
-      trigger: { seconds: 2 },
-    });
-  };
+  // const notify = async (itemName = 'Item') => {
+  //   await Notifications.scheduleNotificationAsync({
+  //     content: {
+  //       title: '🛒 Item Added',
+  //       body: `${itemName} added to your cart!`,
+  //       data: { screen: 'Cart' },
+  //     },
+  //     trigger: { seconds: 2 },
+  //   });
+  // };
 
   const clearCart = async () => {
     try {
-      await db.execAsync('DELETE FROM cartitems');
-      console.log('All cart items deleted from database');
+      await withDB(async (db) => {
+        await db.execAsync("DELETE FROM cartitems");
+      });
+      console.log("All cart items deleted from database");
       setCart([]);
     } catch (e) {
-      console.log('clearCart error', e);
+      console.log("clearCart error", e);
     }
   };
 
   return (
-    <CartContext.Provider value={{
-      getCart,
-      createCart,
-      changeCartItemQuantity,
-      addItemToCart,
-      deleteItemFromCart,
-      clearCart,
-      cart,
-      ...state
-    }}>
+    <CartContext.Provider
+      value={{
+        getCart,
+        createCart,
+        changeCartItemQuantity,
+        addItemToCart,
+        deleteItemFromCart,
+        clearCart,
+        cart,
+        dbLoading,
+        ...state,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

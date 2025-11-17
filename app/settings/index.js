@@ -12,6 +12,5 @@ export let apiUrl = "";
 //     apiUrl = api_url;
 //   }
   apiUrl = api_url;
-  console.log("Using API:", apiUrl);
 
   export const stripeKey = stripe_key;

@@ -67,7 +67,7 @@ function RegisterScreen() {
                 />
               </View>
               {touched.name && errors.name && (
-                <Text style={[defaultStyles.text, styles.errorText]}>{errors.name}</Text>
+                <Text style={[defaultStyles.text, defaultStyles.errorText]}>{errors.name}</Text>
               )}
 
               <View style={defaultStyles.fieldContainer}>
@@ -89,7 +89,7 @@ function RegisterScreen() {
                 />
               </View>
               {touched.email && errors.email && (
-                <Text style={[defaultStyles.text, styles.errorText]}>{errors.email}</Text>
+                <Text style={[defaultStyles.text, defaultStyles.errorText]}>{errors.email}</Text>
               )}
               <View style={defaultStyles.fieldContainer}>
                 <MaterialCommunityIcons

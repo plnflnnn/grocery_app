@@ -5,5 +5,6 @@ export default Object.freeze({
   REGISTER: "Register",
   CHANGE_PASSWORD: "Change Password",
   CHECKOUT: 'Checkout',
-  CART: 'Cart'
+  CART: 'Cart',
+  WELCOME: 'Welcome',
 });
