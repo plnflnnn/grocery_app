@@ -20,7 +20,6 @@ export default function LoginScreen({ navigation }) {
 
   const handleSubmit = async (values) => {
     logIn(values);
-    console.log(values);
   };
 
   return (

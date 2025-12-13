@@ -34,6 +34,7 @@ function useUser() {
       });
 
       let result;
+
       try {
         result = await res.json();
       } catch (err) {
@@ -43,52 +44,87 @@ function useUser() {
       }
 
       if (!res.ok) {
-        setState(prev => ({ ...prev, loading: false, error: true, response: 'Something went wrong' }));
-        throw new Error(`Signup failed: ${res.status}`);
+        if (res.status === 409) {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: true,
+            response: 'This email is already registered',
+          }));
+          throw new Error(`This email is already registered: ${res.status}`);
+        } else {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: true,
+            response: 'Something went wrong',
+          }));
+          throw new Error(`Signup failed: ${res.status}`);
+        }
       }
+
       const { user, token } = result;
-      //setTimeout(async () => {
-        await saveUser(user, token);
-        setUser(user);
-      //}, 100);
+      await saveUser(user, token);
+      setUser(user);
     });
   };
 
 
-  const logIn = async ({ email, password }) => {
-    await handleAsync(async () => {
-      const res = await fetch(`${apiUrl}/users/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+const logIn = async ({ email, password }) => {
+  await handleAsync(async () => {
+    const res = await fetch(`${apiUrl}/users/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const text = await res.text();
+    let result;
+    try {
+      result = await res.json();
+    } catch (err) {
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        error: true,
+        response: 'Server error. Please try again.',
+      }));
+      throw err;
+    }
 
-      let result;
-      try {
-        result = JSON.parse(text);
-      } catch (err) {
-        throw new Error(`Failed to parse JSON. Response: ${text}`);
+    if (!res.ok) {
+      if (res.status === 401) {
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: true,
+          response: 'Invalid email or password',
+        }));
+      } else {
+        setState(prev => ({
+          ...prev,
+          loading: false,
+          error: true,
+          response: result.error || 'Login failed',
+        }));
       }
+      throw new Error(result.error || 'Login failed');
+    }
 
-      //if (!res.ok) throw new Error(result.error || 'Login failed');
-      if (!res.ok) throw new Error(result.error || 'Login failed');
+    const { token, user } = result;
+    if (!user) {
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        error: true,
+        response: 'User data missing',
+      }));
+      throw new Error('User not returned from server');
+    }
 
-      const { token, user } = result;
-      if (!user) throw new Error("No user returned from server");
-
-      const userObj = {
-        id: user.id,
-        email: user.email,
-        userName: user.userName,
-      };
-
-      await saveUser(userObj, token);
-      setUser(userObj);
-    });
-  };
-
+    await saveUser(user, token);
+    setUser(user);
+  });
+};
 
   const logOut = () => {
     setUser(null);
