@@ -1,4 +1,3 @@
-// app/navigation/AppNavigator.js
 import React, { useContext, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -10,12 +9,6 @@ import UserContext from "../auth/context";
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
-  const { user } = useContext(UserContext);
-
-  useEffect(() => {
-    console.log("🟩 AppNavigator render, user =", user);
-  }, [user]);
-
   return (
     <Tab.Navigator>
       <Tab.Screen

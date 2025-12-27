@@ -17,7 +17,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     if (db) {
       createCart();
-      console.log("Cart created (CartContext)");
+      //console.log("Cart created (CartContext)");
     }
   }, [db]);
 

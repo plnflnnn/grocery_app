@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert
 } from "react-native";
-import { Image } from "react-native-expo-image-cache";
+import { Image } from "expo-image";
 import { useCart } from "../context/CartContext";
 
 import colors from "../config/colors";
@@ -18,7 +18,7 @@ function ListingDetailsScreen({ route }) {
   const item = route.params;
   const [quantity, setQuantity] = useState(0);
   const [cartItem, setCartItem] = useState();
-  const {  addItemToCart} = useCart();
+  const {addItemToCart} = useCart();
   const [response, setResponse] = useState('');
 
   let minNum = 0;
@@ -77,10 +77,10 @@ function ListingDetailsScreen({ route }) {
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 100}
     >
       <Image
+        source={{ uri: item.src }}
         style={styles.image}
-        preview={{ uri: item.src }}
-        tint="dark"
-        uri={item.src}
+        contentFit="cover"
+        transition={200}
       />
       <View style={styles.detailsContainer}>
         <Text style={styles.title}>{item.name}</Text>

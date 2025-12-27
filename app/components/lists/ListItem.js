@@ -45,9 +45,9 @@ function ListItem({
 }
 
 const styles = StyleSheet.create({
-  touchable: {
-    backgroundColor: colors.white,
-  },
+  // touchable: {
+  //   backgroundColor: colors.white,
+  // },
   container: {
     flexDirection: "row",
     padding: 15,

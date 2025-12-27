@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, TouchableWithoutFeedback } from "react-native";
-import { Image } from "react-native-expo-image-cache";
+//import { Image } from "react-native-expo-image-cache";
+import { Image } from "expo-image";
 
 import Text from "./Text";
 import colors from "../config/colors";
@@ -10,11 +11,10 @@ function Card({ title, subTitle, imageUrl, onPress, thumbnailUrl }) {
     <TouchableWithoutFeedback onPress={onPress}>
       <View style={styles.card}>
         <Image
+          source={{ uri: imageUrl }}
           style={styles.image}
-          tint="dark"
-          preview={{ uri: thumbnailUrl }}
-          uri={imageUrl}
-          //source={{uri: imageUrl}}
+          contentFit="cover"
+          transition={200}
         />
         <View style={styles.detailsContainer}>
           <Text style={styles.title} numberOfLines={1}>

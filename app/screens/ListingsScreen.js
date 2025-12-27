@@ -8,9 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { Searchbar } from "react-native-paper";
-
 import useDB from "../hooks/useDB";
-
 import Button from "../components/Button";
 import Card from "../components/Card";
 import colors from "../config/colors";
@@ -18,7 +16,6 @@ import routes from "../navigation/routes";
 import Screen from "../components/Screen";
 import AppText from "../components/Text";
 import { apiUrl } from "../settings/index";
-import LoadingOverlay from "../components/LoadingOverlay";
 
 function ListingsScreen({ navigation }) {
   const [error, setError] = useState(false);
@@ -98,7 +95,7 @@ function ListingsScreen({ navigation }) {
             `(${item.id}, "${item.item_name}", "${item.item_src}", "${item.item_category}", "${item.item_price}")`
         )
         .join(", ");
-      console.log("values " + values);
+      //console.log("values " + values);
 
       await withDB(async (db) => {
         await db.execAsync(
@@ -108,7 +105,7 @@ function ListingsScreen({ navigation }) {
 
       console.log("Items inserted into groceryitems");
     } catch (e) {
-      console.log(`saveGroceryItems: An error occurred ${e}`);
+      //console.log(`saveGroceryItems: An error occurred ${e}`);
     }
   }
 
@@ -206,7 +203,6 @@ function ListingsScreen({ navigation }) {
 
   return (
     <>
-      {/* <LoadingOverlay visible={loading || dbLoading} /> */}
       <Screen style={styles.screen}>
         {error && (
           <>
@@ -268,7 +264,6 @@ function ListingsScreen({ navigation }) {
               }`}
               imageUrl={item.src}
               onPress={() => navigation.navigate(routes.LISTING_DETAILS, item)}
-              thumbnailUrl={item.src}
             />
           )}
         />
@@ -280,7 +275,6 @@ function ListingsScreen({ navigation }) {
 const styles = StyleSheet.create({
   screen: {
     backgroundColor: colors.light,
-    paddingTop: 10,
     paddingHorizontal: 10,
   },
   filtersContainer: {

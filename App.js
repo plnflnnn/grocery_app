@@ -36,16 +36,12 @@ export default function App() {
     restoreUser();
   }, []);
 
-  useEffect(() => {
-    console.log("USER in App:", user);
-  }, [user]);
-
   if (!isReady) {
     return <LoadingOverlay visible />;
   }
 
   return (
-      <StripeProvider publishableKey={publishableKey} merchantIdentifier="merchant.identifier" urlScheme="myapp">
+      <StripeProvider publishableKey={publishableKey} merchantIdentifier="merchant.identifier" urlScheme="groceryapp://stripe-redirect">
         <UserContext.Provider value={{ user, setUser }}>
           <CartProvider>
             <OfflineNotice />

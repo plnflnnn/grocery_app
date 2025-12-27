@@ -14,9 +14,13 @@ const styles = StyleSheet.create({
   screen: {
     paddingTop: Constants.statusBarHeight,
     flex: 1,
+    paddingTop: 0,
+    paddingHorizontal: 10,
   },
   view: {
     flex: 1,
+    padding: 0,
+    margin: 0
   },
 });
 

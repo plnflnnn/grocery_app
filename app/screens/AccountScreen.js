@@ -41,10 +41,7 @@ function AccountScreen({ navigation }) {
 const styles = StyleSheet.create({
   screen: {
     backgroundColor: colors.light,
-  },
-  container: {
-    marginVertical: 20,
-  },
+  }
 });
 
 export default AccountScreen;
