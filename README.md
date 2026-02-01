@@ -28,7 +28,12 @@ The Grocery App allows users to:
 - Expo
 - JavaScript
 - SQLite (local database)
-- Postgres
+
+### Backend
+
+- Node.js
+- Express
+- PostgreSQL
 
 ### Navigation
 
