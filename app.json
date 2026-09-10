@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "grocery-app",
+    "slug": "grocery-app",
+    "scheme": "groceryapp",
+    "owner": "plnfln",
+    "version": "1.0.4",
+    "orientation": "portrait",
+    "icon": "./app/assets/logo.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./app/assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.plnfln.groceryapp"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./app/assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.plnfln.groceryapp"
+    },
+    "web": {
+      "favicon": "./app/assets/logo.png"
+    },
+    "updates": {
+      "enabled": true,
+      "url": "https://u.expo.dev/825890d4-d4aa-42f7-9457-6a12e6228feb"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "825890d4-d4aa-42f7-9457-6a12e6228feb"
+      }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-sqlite",
+      "expo-font",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.plnfln.groceryapp",
+          "enableGooglePay": false
+        }
+      ],
+      "expo-image",
+      "expo-splash-screen"
+    ],
+    "runtimeVersion": "1.0.3"
+  }
+}
