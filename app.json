@@ -4,7 +4,7 @@
     "slug": "grocery-app",
     "scheme": "groceryapp",
     "owner": "plnfln",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./app/assets/logo.png",
     "userInterfaceStyle": "light",
@@ -16,7 +16,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.plnfln.groceryapp"
+      "bundleIdentifier": "com.plnfln.groceryapp",
+      "deploymentTarget": "16.4"
     },
     "android": {
       "adaptiveIcon": {
@@ -49,8 +50,15 @@
         }
       ],
       "expo-image",
-      "expo-splash-screen"
+      [
+        "expo-splash-screen",
+        {
+          "image": "./app/assets/logo.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
     ],
-    "runtimeVersion": "1.0.3"
+    "runtimeVersion": "1.0.5"
   }
 }

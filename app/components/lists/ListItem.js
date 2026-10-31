@@ -5,7 +5,6 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Swipeable from "react-native-gesture-handler/Swipeable";
 import Text from "../Text";
 import colors from "../../config/colors";
 
@@ -15,43 +14,40 @@ function ListItem({
   image,
   IconComponent,
   onPress,
-  renderRightActions,
   imageUri,
   arrow = true,
 }) {
   const showImage = Boolean(image || imageUri);
 
   return (
-    <Swipeable renderRightActions={renderRightActions}>
-      <TouchableHighlight
-        underlayColor={colors.light}
-        onPress={onPress}
-        style={styles.touchable}
-      >
-        <View style={styles.container}>
-          {IconComponent}
-          {showImage && (
-            <Image
-              source={imageUri ? { uri: imageUri } : image}
-              style={styles.image}
-            />
-          )}
-          <View style={styles.detailsContainer}>
-            <Text style={styles.title} numberOfLines={1}>{title}</Text>
-            {subTitle && (
-              <Text style={styles.subTitle} numberOfLines={2}>{subTitle}</Text>
-            )}
-          </View>
-          {arrow && (
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={25}
-              color={colors.medium}
-            />
+    <TouchableHighlight
+      underlayColor={colors.light}
+      onPress={onPress}
+      style={styles.touchable}
+    >
+      <View style={styles.container}>
+        {IconComponent}
+        {showImage && (
+          <Image
+            source={imageUri ? { uri: imageUri } : image}
+            style={styles.image}
+          />
+        )}
+        <View style={styles.detailsContainer}>
+          <Text style={styles.title} numberOfLines={1}>{title}</Text>
+          {subTitle && (
+            <Text style={styles.subTitle} numberOfLines={2}>{subTitle}</Text>
           )}
         </View>
-      </TouchableHighlight>
-    </Swipeable>
+        {arrow && (
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={25}
+            color={colors.medium}
+          />
+        )}
+      </View>
+    </TouchableHighlight>
   );
 }
 
